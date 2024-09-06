@@ -1,7 +1,5 @@
 
-//  Assigment
-//  ស៊ុន​ សារុន
-//  វ៉ា រ៉ូណាដូ
+
 
 #include <stdio.h>
 #include <stdlib.h>
