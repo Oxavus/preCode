@@ -85,17 +85,17 @@ void writeMode() { // writeMode use to write to file.
             readMode();
             break;
         }
-    } while (switchMode != 's');  // Exit when 's' is entered
+    } while (switchMode != 's');
 }
 
-void readMode() { // read mode use to read from file.
+void readMode() {
     system("clear");
     char mode;
     printf("********************************************************\n\n\t\t\tRead-Mode\n\n********************************************************\n");
     printf("\t\ti to Search ID || a to Print all  \n\tSearch : ");
-    scanf(" %c", &mode);  // Space before %c to consume newline
+    scanf(" %c", &mode);
 
-    // Open the file and count the number of records
+
     FILE *food = fopen("food.txt", "r");
     if (food == NULL) {
         printf("Could not open file food.txt\n");
@@ -107,9 +107,9 @@ void readMode() { // read mode use to read from file.
     while (fgets(line, sizeof(line), food)) {
         count++;
     }
-    rewind(food); // Rewind the file pointer to the beginning
+    rewind(food);
 
-    // Allocate memory for foodItems array
+
     Food foodItems[count];
     int i = 0;
     while (fgets(line, sizeof(line), food) && i < count) {
@@ -124,7 +124,7 @@ void readMode() { // read mode use to read from file.
         searchID(foodItems, count);
     } else {
         printf("\n\tinvalid input!!!\n");
-        readMode();  // Recursive call instead of goto
+        readMode();
     }
 }
 
@@ -152,7 +152,7 @@ void searchID(Food foodItems[], int count) {
     char option;
 start:
     printf("\na to List All || w to Write to file\n\tOption : ");
-    scanf(" %c", &option);  // Space before %c to consume newline
+    scanf(" %c", &option);
 
     if (option == 'a') {
         readAll(foodItems, count);
@@ -169,22 +169,43 @@ void readAll(Food foodItems[], int count) {
     printf("********************************************************\n\n\t\t\tLIST_OF_FOOD\n\n********************************************************\n");
     printf("*NO****FOODID****FOODNAME*******TYPE******UNITPRICE******QUANTITY*****AMOUNT\n");
 
-    FILE *food;
-    char filename[] = "food.txt";
-    food = fopen(filename, "r"); // Open file in read mode
-    if (food == NULL) {
-        printf("Could not open file %s\n", filename);
-        return;
+
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+    FILE *file;
+    int ids[100], id, count = 0;
+
+    // Open the file for reading
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Unable to open file: %s\n", filename);
+        return 1;
     }
 
-    char line[256]; // Buffer to hold each line
+    // Read integers from the file into the array
+    while (fscanf(file, "%d", &id) != EOF) {
+        ids[count++] = id;
+    }
+    fclose(file);
 
-    // Read the file line by line
-    while (fgets(line, sizeof(line), food)) {
-        printf("%s", line); // Print the line to the console
+    // Sort the array using qsort
+    qsort(ids, count, sizeof(int), compare);
+
+    // Open the file for writing (overwrite the file)
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Unable to open file: %s\n", filename);
+        return 1;
     }
 
-    fclose(food); // Close the file
+    // Write sorted integers back to the file
+    for (int i = 0; i < count; ++i) {
+        fprintf(file, "%d\n", ids[i]);
+    }
+    fclose(file);
+
+    printf("IDs sorted and saved to %s\n", filename);
 
     char option;
 start:

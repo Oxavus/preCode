@@ -1,0 +1,9 @@
+0     A1      cocoa          drink        3.00             5         15.00
+1     E3      banana          fuit        6.00             8         48.00
+	Total Quantity : 13
+	Total Amount : 63.00
+0     3D      banana          fuit        2.00             5         10.00
+1     1A      coca          drink        2.00             6         12.00
+2     2E      carrot          vegetable        2.00             7         14.00
+	Total Quantity : 18
+	Total Amount : 36.00
