@@ -15,106 +15,173 @@ struct Staffdata
 	       sex[5],
 	       adres[10],
 	       userInput;
-	int age, phone, salary;
-	bool loop;
+	int age, phone;
+	float salary;
 };
 //------------------------------------------------------------
 
 
 //------------------------menu()------------------------------
-class Menu
+class Menu : public Func
 {
 public:
 	Staffdata Staff;
-	Menu() {
-		Staff.loop = true;
-	}
 	int run()
 	{
 		do
 		{
-			cout << "*************************Menu:**************************\n\tr to Read\n\tw to Write" << endl;
+			cout << "*************************Menu:**************************\n\tr to Read\n\tw to Write\n\tx to Exit" << endl;
 			cin >> Staff.userInput;
 
 			if (Staff.userInput == "w") {
 				do
 				{
-					cout << "**************************Menu:*************************\n\tn to New\n\te to Filen\td to Delete" << endl;
+					cout << "**************************Menu:*************************\n\tn to New\n\te to Filen\n\td to Delete" << endl;
 					cin >> Staff.userInput;
+                       system("clear");
 					if (Staff.userInput == "n") {
+                        system("clear");
 						cout << "**************************New_File Menu:*************************\n\tFile Name : ";
 						cin >> Staff.userInput;
-						cout << "File Created: " << Staff.userInput << endl;
+						//Func.newFile(Staff.userInput);
+						// fillForm();
+						//Func.writeToFile(Staff.userInput, Staff.id, Staff.name, Staff.sex, Staff.age, Staff.adres, Staff.phone, Staff.salary);
 					}
+
 					else if (Staff.userInput == "e") {
-						cout << "**************************Edit_File Menu:*************************\n\tFile Name : ";
+                        system("clear");
+						cout << "**************************Edit_File Menu:*************************\n\tList Files";
+						// list directory Func.listDir();
+						cout << "File Name : ";
 						cin >> Staff.userInput;
-						cout << "File Edited: " << Staff.userInput << endl;
 					}
 					else if (Staff.userInput == "d") {
+                           system("clear");
 						cout << "**************************Delete_File Menu:*************************\n\tFile Name : ";
 						cin >> Staff.userInput;
 						cout << "File Deleted: " << Staff.userInput << endl;
-					}
-					else {
+						//Func.deleteFile(Staff.userInput);
+					}else if(Staff.userInput== "x"){
+                        cout << "\nClosing!!!" << endl;
+					}else {
 						cout << "\nInvalid Input!!!" << endl;
 					}
-				} while (Staff.loop);
+				} while (Staff.userInput!="x");
 			}
 			else if (Staff.userInput == "r") {
 				do
 				{
-					cout << "**************************Read_Mode Menu:*************************\n\ta to Read\n\ts to Search\n\tx to Read All" << endl;
+					cout << "**************************Read_Mode Menu:*************************\n\ta to List all Files\n\ts to Search\n\tx to Exit" << endl;
 					cin >> Staff.userInput;
 
 					if (Staff.userInput == "a") {
-						cout << "**************************Read_File Menu:*************************\n\tFile Name : ";
+                        system("clear");
+						cout << "**************************List_All_Files*************************\n";
+						//Func.listDir();
+						//Func.readFile(Staff.userInput);
+						cout << "File Name : ";
 						cin >> Staff.userInput;
-						cout << "File Read: " << Staff.userInput << endl;
 					}
 					else if (Staff.userInput == "s") {
+                        system("clear");
 						cout << "**************************Search_File Menu:*************************\n\tFile Name : ";
 						cin >> Staff.userInput;
 						cout << "File Searched: " << Staff.userInput << endl;
 					}
-					else if (Staff.userInput == "x") {
+					else if (Staff.userInput == "all") {
+                        system("clear");
 						cout << "**************************Read_All_File:*************************\n\t";
 						cin >> Staff.userInput;
-						cout << "All Files Read: " << Staff.userInput << endl;
-					}
-					else {
+					}else if(Staff.userInput=="x"){
+                        cout << "\nClosing!!!" << endl;
+					}else {
 						cout << "\nInvalid Input!!!" << endl;
 					}
-				} while (Staff.loop);
+				} while (Staff.userInput!="x");
 			}
-			else {
+			else if(Staff.userInput=="x"){
+				cout << "\nClosing!!!" << endl;
+			}else {
 				cout << "\nInvalid Input!!!" << endl;
 			}
-		} while (Staff.loop);
+		}while (Staff.userInput!="x");
 
 		return 0;
 	}
+void fileForm(){
+cout << "**************************Fill_Form:*************************\n";
+cout << "STAFFID :"
+cin >> Staff.id;
+cout << "STAFFNAME :"
+cin >> Staff.name;
+cout << "SEX :"
+cin >> Staff.sex;
+cout << "AGE :"
+cin >> Staff.age;
+cout << "ADDRESS :"
+cin >> Staff.address;
+cout << "PHONE :"
+cin >> Staff.phone;
+cout << "SALARY :"
+cin >> Staff.salary;
+}
 };
 //------------------------------------------------------------
 
-//------------------------------MODS-------------------------
-class Mode
+//------------------------------MODS--------------------------
+class Func : public Sort
 {
 public:
-void newFile(string filename)
+
+void newFile(string filename)// need fixing
 {
-    ofstream MyFile("%s.txt", filename);
+ string dirPath = "Staff";
+    try {
+        if (fs::create_directory(dirPath)) {
+            cout << "Directory created successfully." << endl;
+        } else {
+            cout << "Directory already exists or could not be created." << endl;
+        }
+    } catch (const fs::filesystem_error& e) {
+        cerr << "Filesystem error: " << e.what() << endl;
+    }
+
+   ofstream MyFile("%s.txt", filename);
     MyFile.close();
 }
 
-
-void editFile()
+void editFile(string filename)
 {
+    ifstream infile(filename);
+    if (!infile.is_open()) {
+        cerr << "Could not open the file for reading!" << endl;
+        return 1;
+    }
+    string content;
+    string line;
+    while (getline(infile, line)) {
+        content += line + "\n";
+    }
+    infile.close();
+    string oldText = "oldText";
+    string newText = "newText";
+    size_t pos = content.find(oldText);
+    if (pos != string::npos) {
+        content.replace(pos, oldText.length(), newText);
+    }
+    ofstream outfile(filename);
+    if (!outfile.is_open()) {
+        cerr << "Could not open the file for writing!" << endl;
+        return 1;
+    }
+    outfile << content;
+    outfile.close();
+    cout << "File updated successfully." << endl;
 }
 
-void deleteFile()
+void deleteFile(string filename)
 {
-    int status = remove("myfile.txt");
+    int status = remove("%s.txt",filename);
     if (status != 0) {
         perror("Error deleting file");
     }
@@ -123,7 +190,7 @@ void deleteFile()
     }
 }
 
-void readfile(string filename)
+void readFile(string filename)
 {
     ifstream inputFile("%s.txt", filename);
     if (!inputFile.is_open()) {
@@ -166,7 +233,7 @@ void searchData(string filename, string searchID)
 
 void listDir()
 {
-    string path = "./";
+    string path = "Staff/";
     try {
 
         if (fs::exists(path) && fs::is_directory(path)) {
@@ -180,9 +247,25 @@ void listDir()
     } catch (const fs::filesystem_error& e) {
         cerr << "Filesystem error: " << e.what() << endl;
     }
-
 }
 
+ // college all user input and write to text file add NO system
+void writeToFile(string filename, string id, string name, string sex, int age, string address, int phone, float salary ){
+     string line;
+     int note=0;
+    ofstream file;
+    file.open(filename);
+      while (getline(file, line)) {
+      note+=1;
+    }
+    if (file.eof()) {
+       file << "%d-%s-%s-%s-%d-%s-%d-%f", note, id, name, sex, age, address, phone, salary << endl;
+    } else {
+        cerr << "Error reading file!" << endl;
+    }
+    file.close();
+    cout << "write to " << filename << " successfully." << endl;
+}
 };
 //-----------------------------------------------------------
 
@@ -191,14 +274,13 @@ class Sort
 {
 public:
 
-    engine()
+    bubble(string filename)
     {
-      ifstream inputFile("input.txt");
+      ifstream inputFile("%s.txt",filename);
     if (!inputFile) {
         cerr << "Error: Could not open the input file.\n";
         return 1;
     }
-
     vector<string> lines;
     string line;
     while (getline(inputFile, line)) {
