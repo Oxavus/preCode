@@ -17,6 +17,9 @@ struct Staffdata
 	       userInput;
 	int age, phone;
 	float salary;
+	 string toString() {
+        return id + " " + name + " " + sex + " " + to_string(age) + " " + address + " " + to_string(phone) + " " + to_string(salary);
+    }
 };
 //------------------------------------------------------------
 
@@ -43,24 +46,25 @@ public:
                         system("clear");
 						cout << "**************************New_File Menu:*************************\n\tFile Name : ";
 						cin >> Staff.userInput;
-						//Func.newFile(Staff.userInput);
-						// fillForm();
-						//Func.writeToFile(Staff.userInput, Staff.id, Staff.name, Staff.sex, Staff.age, Staff.adres, Staff.phone, Staff.salary);
+						Func.newFile(Staff.userInput);
+						fillForm();
+						Func.writeToFile(Staff.userInput, Staff.id, Staff.name, Staff.sex, Staff.age, Staff.adres, Staff.phone, Staff.salary);
 					}
 
 					else if (Staff.userInput == "e") {
                         system("clear");
 						cout << "**************************Edit_File Menu:*************************\n\tList Files";
-						// list directory Func.listDir();
+						list directory Func.listDir();
 						cout << "File Name : ";
 						cin >> Staff.userInput;
+						Func.editFile(Staff.userInput);
 					}
 					else if (Staff.userInput == "d") {
                            system("clear");
 						cout << "**************************Delete_File Menu:*************************\n\tFile Name : ";
 						cin >> Staff.userInput;
 						cout << "File Deleted: " << Staff.userInput << endl;
-						//Func.deleteFile(Staff.userInput);
+						Func.deleteFile(Staff.userInput);
 					}else if(Staff.userInput== "x"){
                         cout << "\nClosing!!!" << endl;
 					}else {
@@ -77,21 +81,20 @@ public:
 					if (Staff.userInput == "a") {
                         system("clear");
 						cout << "**************************List_All_Files*************************\n";
-						//Func.listDir();
-						//Func.readFile(Staff.userInput);
+						Func.listDir();
 						cout << "File Name : ";
 						cin >> Staff.userInput;
+						Func.readFile(Staff.userInput);
 					}
 					else if (Staff.userInput == "s") {
                         system("clear");
 						cout << "**************************Search_File Menu:*************************\n\tFile Name : ";
 						cin >> Staff.userInput;
-						cout << "File Searched: " << Staff.userInput << endl;
+						cout << "\tStaff ID:";
+						string tmp[10];
+						cin >> tmp;
+						Func.searchData(Staff.userInput, tmp);
 					}
-					else if (Staff.userInput == "all") {
-                        system("clear");
-						cout << "**************************Read_All_File:*************************\n\t";
-						cin >> Staff.userInput;
 					}else if(Staff.userInput=="x"){
                         cout << "\nClosing!!!" << endl;
 					}else {
@@ -110,19 +113,19 @@ public:
 	}
 void fileForm(){
 cout << "**************************Fill_Form:*************************\n";
-cout << "STAFFID :"
+cout << "STAFFID :";
 cin >> Staff.id;
-cout << "STAFFNAME :"
+cout << "STAFFNAME :";
 cin >> Staff.name;
 cout << "SEX :"
 cin >> Staff.sex;
 cout << "AGE :"
 cin >> Staff.age;
-cout << "ADDRESS :"
+cout << "ADDRESS :";
 cin >> Staff.address;
-cout << "PHONE :"
+cout << "PHONE :";
 cin >> Staff.phone;
-cout << "SALARY :"
+cout << "SALARY :";
 cin >> Staff.salary;
 }
 };
@@ -133,7 +136,7 @@ class Func : public Sort
 {
 public:
 
-void newFile(string filename)// need fixing
+void newFile(string filename)
 {
  string dirPath = "Staff";
     try {
@@ -233,7 +236,7 @@ void searchData(string filename, string searchID)
 
 void listDir()
 {
-    string path = "Staff/";
+    string path = "/Staff";
     try {
 
         if (fs::exists(path) && fs::is_directory(path)) {
@@ -249,7 +252,6 @@ void listDir()
     }
 }
 
- // college all user input and write to text file add NO system
 void writeToFile(string filename, string id, string name, string sex, int age, string address, int phone, float salary ){
      string line;
      int note=0;
@@ -274,31 +276,99 @@ class Sort
 {
 public:
 
-    bubble(string filename)
-    {
-      ifstream inputFile("%s.txt",filename);
-    if (!inputFile) {
-        cerr << "Error: Could not open the input file.\n";
-        return 1;
+    vector<string> split(const string &str) {
+    vector<string> result;
+    string word = "";
+    for (char ch : str) {
+        if (ch == ' ') {
+            result.push_back(word);
+            word = "";
+        } else {
+            word += ch;
+        }
     }
-    vector<string> lines;
+    result.push_back(word);
+    return result;
+}
+
+// Function to read records from a file
+vector<Staffdata> readFromFile(const string &filename) {
+    vector<Staffdata> staffList;
+    ifstream inputFile(filename);
+
+    if (!inputFile) {
+        cerr << "Could not open the file!" << endl;
+        return staffList;
+    }
+
     string line;
     while (getline(inputFile, line)) {
-        lines.push_back(line);
+        vector<string> data = split(line);
+        if (data.size() < 7) continue; // Ensure there's enough data in the line
+
+        Staffdata staff;
+        staff.id = data[0];
+        staff.name = data[1];
+        staff.sex = data[2];
+        staff.age = stoi(data[3]);
+        staff.address = data[4];
+        staff.phone = stoi(data[5]);
+        staff.salary = stof(data[6]);
+
+        staffList.push_back(staff);
     }
+
     inputFile.close();
-    sort(lines.begin(), lines.end());
-    ofstream outputFile("output.txt");
+    return staffList;
+}
+
+// Function to write records to a file
+void writeToFile(const string &filename, const vector<Staffdata> &staffList) {
+    ofstream outputFile(filename);
+
     if (!outputFile) {
-        cerr << "Error: Could not open the output file.\n";
-        return 1;
+        cerr << "Could not open the file!" << endl;
+        return;
     }
-    for (const auto& sortedLine : lines) {
-        outputFile << sortedLine << '\n';
+
+    for (const auto &staff : staffList) {
+        outputFile << staff.toString() << endl;
     }
+
     outputFile.close();
-    cout << "Sorting complete! Check 'output.txt' for the sorted text.\n";
+}
+
+
+void bubbleSort(vector<Staffdata> &staffList) {
+    int n = staffList.size();
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (staffList[j].id > staffList[j + 1].id) {
+                swap(staffList[j], staffList[j + 1]);
+            }
+        }
     }
+}
+
+int main() {
+    string filename = "staff_records.txt";
+
+
+    vector<Staffdata> staffList = readFromFile(filename);
+
+
+    cout << "Before sorting:\n";
+    for (const auto &staff : staffList) {
+        cout << staff.toString() << endl;
+    }
+
+    bubbleSort(staffList);
+    cout << "\nAfter sorting:\n";
+    for (const auto &staff : staffList) {
+        cout << staff.toString() << endl;
+    }
+    writeToFile("sorted_" + filename, staffList);
+
 };
 //-----------------------------------------------------------
 
