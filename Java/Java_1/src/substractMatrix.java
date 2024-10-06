@@ -1,20 +1,19 @@
 
-public class multiplyMatrix {
+public class substractMatrix {
     public static void main(String[] args) {
-        int[][] matrixA = { { 3,2 }, { 3, 1 } };
-        int[][] matrixB = { { 1,2 }, { 3,1 } };
+        int[][] A = { { 3, 2 }, 
+                      { 3, 1 } };
+        int[][] B = { { 1, 2 }, 
+                      { 3, 1 } };
         int[][] result = new int[2][2];
 
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
-                result[i][j] = 0;
-                for (int k = 0; k < 2; k++) {
-                    result[i][j] += matrixA[i][k] * matrixB[k][j];
-                }
+                result[i][j] = A[i][j] - B[i][j];
             }
         }
 
-        System.out.println("Multipled 2x2 matrix:");
+        System.out.println("subtract Matrix:");
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 System.out.print(result[i][j] + " ");
